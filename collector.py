@@ -5,7 +5,7 @@ URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 params = {
     "keywordSearch": "Apache",
-    "resultsPerpage": 5,
+    "resultsPerPage": 5,
 }
 
 response = requests.get(URL, params=params, timeout=30)
@@ -14,6 +14,8 @@ print(response.status_code)
 data = response.json()
 print(data["totalResults"])
 
-first = data["vulnerabilities"][0]
-
-print(json.dumps(first, indent=2, ensure_ascii=False)[:2000])
+for item in data["vulnerabilities"]:
+    cve_id = item["cve"]["id"]
+    published = item["cve"]["published"][:10]
+    description = item["cve"]["descriptions"][0]["value"][:60]
+    print(f"{cve_id}  {published}  {description}")
