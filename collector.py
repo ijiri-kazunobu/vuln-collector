@@ -1,15 +1,19 @@
+import json
 import requests
 
-URL = "https://jvndb.jvn.jp/myjvn"
+URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 params = {
-    "method": "getVulnOverviewList",
-    "feed": "hnd",
-    "keyword": "Apache",
+    "keywordSearch": "Apache",
+    "resultsPerpage": 5,
 }
 
-response = requests.get(URL, params=params, timeout=10)
-response.encoding = "utf-8"
-
+response = requests.get(URL, params=params, timeout=30)
 print(response.status_code)
-print(response.text[:1500])
+
+data = response.json()
+print(data["totalResults"])
+
+first = data["vulnerabilities"][0]
+
+print(json.dumps(first, indent=2, ensure_ascii=False)[:2000])
