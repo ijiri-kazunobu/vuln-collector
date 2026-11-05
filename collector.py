@@ -1,3 +1,4 @@
+import csv
 import json
 from datetime import datetime, timedelta
 import requests
@@ -22,8 +23,18 @@ print(response.status_code)
 data = response.json()
 print(data["totalResults"])
 
+rows = []
 for item in data["vulnerabilities"]:
     cve_id = item["cve"]["id"]
     published = item["cve"]["published"][:10]
-    description = item["cve"]["descriptions"][0]["value"][:60]
-    print(f"{cve_id}  {published}  {description}")
+    description = item["cve"]["descriptions"][0]["value"].replace("\n", " ")
+    url = f"https://nvd.nist.gov/vuln/detail/{cve_id}"
+    print(f"{cve_id}  {published}  {description[:60]}")
+    rows.append([cve_id, published, description, url])
+
+with open("result.csv", "w", newline="", encoding="utf-8-sig") as f:
+    writer = csv.writer(f)
+    writer.writerow(["CVE番号", "公開日", "説明", "URL"])
+    writer.writerows(rows)
+
+print(f"{len(rows)} 件を result.csv に保存しました")
